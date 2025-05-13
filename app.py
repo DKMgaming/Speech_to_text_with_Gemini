@@ -24,13 +24,21 @@ def generate_transcription(uploaded_file):
     if not mime_type:
         raise ValueError(f"Unable to guess MIME type for the file: {uploaded_file.name}")
     
-    # Tải tệp lên Google GenAI bằng BytesIO
-    audio_data = BytesIO(uploaded_file.getvalue())  # Sử dụng BytesIO để tạo đối tượng file-like
+    # Đọc tệp vào bộ nhớ tạm (BytesIO)
+    audio_data = BytesIO(uploaded_file.getvalue())
     
-    # Tải tệp lên API GenAI
-    files = [
-        client.files.upload(file=audio_data, mime_type=mime_type),  # Cung cấp MIME type chính xác
-    ]
+    # Lưu tệp vào tệp tin tạm thời trên hệ thống (tùy chọn)
+    with open("temp_audio_file", "wb") as f:
+        f.write(uploaded_file.getvalue())
+    
+    # Cố gắng tải tệp lên API GenAI
+    try:
+        files = [
+            client.files.upload(file="temp_audio_file", mime_type=mime_type),  # Đảm bảo sử dụng tên tệp tạm thời
+        ]
+    except Exception as e:
+        st.error(f"Error uploading file: {str(e)}")
+        return None
     
     model = "gemini-2.5-flash-preview-04-17"
     
@@ -71,17 +79,18 @@ def main():
     if uploaded_file is not None:
         # Gọi hàm để trích xuất nội dung
         transcription = generate_transcription(uploaded_file)
-        st.write("Nội dung trích xuất từ âm thanh:")
-        st.text_area("Transcript", transcription, height=200)
+        if transcription:
+            st.write("Nội dung trích xuất từ âm thanh:")
+            st.text_area("Transcript", transcription, height=200)
 
-        # Tạo và cho phép tải xuống file Word
-        word_file = create_word_document(transcription)
-        st.download_button(
-            label="Tải về file Word",
-            data=word_file,
-            file_name="transcription.docx",
-            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        )
+            # Tạo và cho phép tải xuống file Word
+            word_file = create_word_document(transcription)
+            st.download_button(
+                label="Tải về file Word",
+                data=word_file,
+                file_name="transcription.docx",
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            )
 
 if __name__ == "__main__":
     main()
