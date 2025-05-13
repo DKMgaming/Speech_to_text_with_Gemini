@@ -10,12 +10,16 @@ API_KEY = os.getenv("AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ")
 
 # Tạo client của Google GenAI
 def generate_transcription(file_path):
+    # Khởi tạo client Google GenAI
+    if not API_KEY:
+        raise ValueError("API Key is missing. Please set the GEMINI_API_KEY environment variable.")
+        
     client = genai.Client(api_key=API_KEY)
     files = [
         client.files.upload(file=file_path),
     ]
     model = "gemini-2.5-flash-preview-04-17"
-
+    
     contents = [
         types.Content(
             role="user",
@@ -26,11 +30,10 @@ def generate_transcription(file_path):
             parts=[types.Part.from_text(text="lấy nội dung đàm thoại của file âm thanh này")],
         ),
     ]
-
-    # Trích xuất nội dung từ API GenAI
+    
     response = client.models.generate_content(model=model, contents=contents)
     return response.text
-
+    
 # Tạo và tải xuống file Word (.docx)
 def create_word_document(transcription):
     doc = Document()
