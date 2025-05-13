@@ -24,12 +24,12 @@ def generate_transcription(uploaded_file):
     if not mime_type:
         raise ValueError(f"Unable to guess MIME type for the file: {uploaded_file.name}")
     
-    # Đọc file và tải lên API GenAI (Sử dụng 'open' để đảm bảo truyền đúng kiểu file)
-    with open(uploaded_file.name, "wb") as f:
-        f.write(uploaded_file.getbuffer())
+    # Tải tệp lên Google GenAI bằng BytesIO
+    audio_data = BytesIO(uploaded_file.getvalue())  # Sử dụng BytesIO để tạo đối tượng file-like
     
+    # Tải tệp lên API GenAI
     files = [
-        client.files.upload(file=uploaded_file, mime_type=mime_type),  # Cung cấp MIME type chính xác
+        client.files.upload(file=audio_data, mime_type=mime_type),  # Cung cấp MIME type chính xác
     ]
     
     model = "gemini-2.5-flash-preview-04-17"
