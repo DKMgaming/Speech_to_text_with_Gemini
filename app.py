@@ -9,13 +9,13 @@ from docx import Document
 # Tải API Key từ môi trường (cập nhật nếu cần)
 
 # API_KEY = os.getenv("AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ")
-API_KEY = "AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ"
-# Tạo client của Google GenAI
+# API_KEY = "AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ"
 def generate_transcription(file_path):
-    # Khởi tạo client Google GenAI
+    API_KEY = st.secrets["GEMINI_API_KEY"]  # Lấy API Key từ Streamlit Secrets
     if not API_KEY:
-        raise ValueError("API Key is missing. Please set the GEMINI_API_KEY environment variable.")
-        
+        raise ValueError("API Key is missing. Please set the GEMINI_API_KEY in the Streamlit secrets.")
+    
+    # Khởi tạo client Google GenAI
     client = genai.Client(api_key=API_KEY)
     files = [
         client.files.upload(file=file_path),
