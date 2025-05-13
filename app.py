@@ -3,14 +3,17 @@ import os
 from google import genai
 from google.genai import types
 from io import BytesIO
+import mimetypes
+from docx import Document
 
 # Lấy API Key từ Streamlit Secrets
-API_KEY = st.secrets["general"]["GEMINI_API_KEY"]
+API_KEY = st.secrets["general"]["GENAI_API_KEY"]
 
 # Kiểm tra API Key
 if not API_KEY:
-    raise ValueError("API Key is missing. Please set the GEMINI_API_KEY in Streamlit secrets.")
+    raise ValueError("API Key is missing. Please set the GENAI_API_KEY in Streamlit secrets.")
 
+# Hàm trích xuất nội dung từ file âm thanh
 def generate_transcription(uploaded_file):
     # Khởi tạo client Google GenAI
     client = genai.Client(api_key=API_KEY)
