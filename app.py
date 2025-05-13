@@ -5,18 +5,26 @@ from google.genai import types
 from io import BytesIO
 from docx import Document
 
+# Lấy API Key từ Streamlit Secrets
 API_KEY = st.secrets["general"]["GENAI_API_KEY"]
 
 # Kiểm tra API Key
 if not API_KEY:
     raise ValueError("API Key is missing. Please set the GENAI_API_KEY in Streamlit secrets.")
+
 # Hàm trích xuất nội dung từ file âm thanh
-def generate_transcription(file_path):
+def generate_transcription(uploaded_file):
     # Khởi tạo client Google GenAI
     client = genai.Client(api_key=API_KEY)
+    
+    # Tải tệp từ Streamlit uploader vào bộ nhớ tạm (BytesIO)
+    audio_data = BytesIO(uploaded_file.getvalue())
+    
+    # Tải tệp lên API GenAI
     files = [
-        client.files.upload(file=file_path),
+        client.files.upload(file=audio_data),  # Sử dụng đối tượng BytesIO cho tệp âm thanh
     ]
+    
     model = "gemini-2.5-flash-preview-04-17"
     
     contents = [
@@ -54,12 +62,8 @@ def main():
     uploaded_file = st.file_uploader("Chọn file âm thanh", type=["mp3", "m4a", "wav"])
 
     if uploaded_file is not None:
-        # Lưu file âm thanh vào bộ nhớ tạm
-        with open("temp_audio_file", "wb") as f:
-            f.write(uploaded_file.getbuffer())
-
         # Gọi hàm để trích xuất nội dung
-        transcription = generate_transcription("temp_audio_file")
+        transcription = generate_transcription(uploaded_file)
         st.write("Nội dung trích xuất từ âm thanh:")
         st.text_area("Transcript", transcription, height=200)
 
