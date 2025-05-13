@@ -3,6 +3,7 @@ import os
 from google import genai
 from google.genai import types
 from io import BytesIO
+import mimetypes
 from docx import Document
 
 # Lấy API Key từ Streamlit Secrets
@@ -17,33 +18,28 @@ def generate_transcription(uploaded_file):
     # Khởi tạo client Google GenAI
     client = genai.Client(api_key=API_KEY)
     
-    # Xác định MIME type rõ ràng cho các loại tệp âm thanh
-    mime_type = None
-    if uploaded_file.name.endswith(".mp3"):
-        mime_type = "audio/mpeg"
-    elif uploaded_file.name.endswith(".m4a"):
-        mime_type = "audio/mp4"
-    elif uploaded_file.name.endswith(".wav"):
-        mime_type = "audio/wav"
-    else:
-        st.error("Unsupported file type")
-        return None
-
-    if not mime_type:
-        st.error(f"Unable to determine MIME type for the file: {uploaded_file.name}")
-        return None
-
     # Đọc tệp vào bộ nhớ tạm (BytesIO)
     audio_data = BytesIO(uploaded_file.getvalue())
     
-    # Lưu tệp vào tệp tin tạm thời trên hệ thống (tùy chọn)
-    with open("temp_audio_file", "wb") as f:
-        f.write(uploaded_file.getvalue())
+    # Xác định MIME type từ tên tệp
+    mime_type, _ = mimetypes.guess_type(uploaded_file.name)
     
+    # Nếu không thể xác định MIME type, tự gán MIME type cho các loại tệp âm thanh
+    if not mime_type:
+        if uploaded_file.name.endswith(".mp3"):
+            mime_type = "audio/mpeg"
+        elif uploaded_file.name.endswith(".m4a"):
+            mime_type = "audio/mp4"
+        elif uploaded_file.name.endswith(".wav"):
+            mime_type = "audio/wav"
+        else:
+            st.error("Unsupported file type")
+            return None
+
     # Tải tệp lên API GenAI với MIME type đã xác định
     try:
         files = [
-            client.files.upload(file="temp_audio_file"),  # Không cần truyền mime_type nữa
+            client.files.upload(file=audio_data),  # Truyền file trực tiếp từ BytesIO
         ]
     except Exception as e:
         st.error(f"Error uploading file: {str(e)}")
