@@ -18,18 +18,18 @@ def generate_transcription(uploaded_file):
     # Khởi tạo client Google GenAI
     client = genai.Client(api_key=API_KEY)
     
-    # Tải tệp từ Streamlit uploader vào bộ nhớ tạm (BytesIO)
-    audio_data = BytesIO(uploaded_file.getvalue())
-    
     # Xác định MIME type từ tên tệp (hoặc bạn có thể xác định nó thủ công)
     mime_type, _ = mimetypes.guess_type(uploaded_file.name)
     
     if not mime_type:
         raise ValueError(f"Unable to guess MIME type for the file: {uploaded_file.name}")
     
-    # Tải tệp lên API GenAI
+    # Đọc file và tải lên API GenAI (Sử dụng 'open' để đảm bảo truyền đúng kiểu file)
+    with open(uploaded_file.name, "wb") as f:
+        f.write(uploaded_file.getbuffer())
+    
     files = [
-        client.files.upload(file=audio_data, mime_type=mime_type),  # Cung cấp MIME type chính xác
+        client.files.upload(file=uploaded_file, mime_type=mime_type),  # Cung cấp MIME type chính xác
     ]
     
     model = "gemini-2.5-flash-preview-04-17"
