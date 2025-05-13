@@ -3,6 +3,7 @@ import os
 from google import genai
 from google.genai import types
 from io import BytesIO
+import mimetypes
 from docx import Document
 
 # Lấy API Key từ Streamlit Secrets
@@ -20,9 +21,15 @@ def generate_transcription(uploaded_file):
     # Tải tệp từ Streamlit uploader vào bộ nhớ tạm (BytesIO)
     audio_data = BytesIO(uploaded_file.getvalue())
     
+    # Xác định MIME type từ tên tệp (hoặc bạn có thể xác định nó thủ công)
+    mime_type, _ = mimetypes.guess_type(uploaded_file.name)
+    
+    if not mime_type:
+        raise ValueError(f"Unable to guess MIME type for the file: {uploaded_file.name}")
+    
     # Tải tệp lên API GenAI
     files = [
-        client.files.upload(file=audio_data),  # Sử dụng đối tượng BytesIO cho tệp âm thanh
+        client.files.upload(file=audio_data, mime_type=mime_type),  # Cung cấp MIME type chính xác
     ]
     
     model = "gemini-2.5-flash-preview-04-17"
