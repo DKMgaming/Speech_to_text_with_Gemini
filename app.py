@@ -16,7 +16,7 @@ def generate_transcription(file_path):
         raise ValueError("API Key is missing. Please set the GEMINI_API_KEY in the Streamlit secrets.")
     
     # Khởi tạo client Google GenAI
-    client = genai.Client(api_key=API_KEY)
+    client = genai.Client(api_key=GEMINI_API_KEY)
     files = [
         client.files.upload(file=file_path),
     ]
