@@ -3,8 +3,8 @@ import os
 from google import genai
 from google.genai import types
 from io import BytesIO
-from python_docx import Document
-
+# from python_docx import Document
+from docx import Document
 # Tải API Key từ môi trường (cập nhật nếu cần)
 API_KEY = os.getenv("AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ")
 
