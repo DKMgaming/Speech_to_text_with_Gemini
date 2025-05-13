@@ -13,7 +13,6 @@ API_KEY = st.secrets["general"]["GENAI_API_KEY"]
 if not API_KEY:
     raise ValueError("API Key is missing. Please set the GENAI_API_KEY in Streamlit secrets.")
 
-# Hàm trích xuất nội dung từ file âm thanh
 def generate_transcription(uploaded_file):
     # Khởi tạo client Google GenAI
     client = genai.Client(api_key=API_KEY)
@@ -21,7 +20,23 @@ def generate_transcription(uploaded_file):
     # Đọc tệp vào bộ nhớ tạm (BytesIO)
     audio_data = BytesIO(uploaded_file.getvalue())
     
-    # Tải tệp lên API GenAI
+    # Xác định MIME type từ tên tệp hoặc chỉ định thủ công
+    mime_type = None
+    if uploaded_file.name.endswith(".mp3"):
+        mime_type = "audio/mpeg"
+    elif uploaded_file.name.endswith(".m4a"):
+        mime_type = "audio/mp4"
+    elif uploaded_file.name.endswith(".wav"):
+        mime_type = "audio/wav"
+    else:
+        st.error("Unsupported file type")
+        return None
+
+    if not mime_type:
+        st.error(f"Unable to determine MIME type for the file: {uploaded_file.name}")
+        return None
+
+    # Tải tệp lên API GenAI với MIME type đã xác định
     try:
         files = [
             client.files.upload(file=audio_data),  # Truyền file trực tiếp từ BytesIO
@@ -47,8 +62,6 @@ def generate_transcription(uploaded_file):
     return response.text
 
 def create_word_document(transcription):
-    from docx import Document
-    
     doc = Document()
     doc.add_heading('Transcription from Audio File', 0)
     doc.add_paragraph(transcription)
