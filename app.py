@@ -12,6 +12,7 @@ from docx import Document
 # API_KEY = "AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ"
 def generate_transcription(file_path):
     API_KEY = st.secrets["genai_api_key"]  # Lấy API Key từ Streamlit Secrets
+    print = "API_KEY"
     if not API_KEY:
         raise ValueError("API Key is missing. Please set the GEMINI_API_KEY in the Streamlit secrets.")
     
