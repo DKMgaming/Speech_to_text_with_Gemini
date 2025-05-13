@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 from google import genai
+import google.generativeai as genai
 from google.genai import types
 from io import BytesIO
 # from python_docx import Document
