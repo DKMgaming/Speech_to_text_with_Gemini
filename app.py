@@ -31,10 +31,10 @@ def generate_transcription(uploaded_file):
     with open("temp_audio_file", "wb") as f:
         f.write(uploaded_file.getvalue())
     
-    # Cố gắng tải tệp lên API GenAI
+    # Cố gắng tải tệp lên API GenAI mà không cần truyền MIME type
     try:
         files = [
-            client.files.upload(file="temp_audio_file", mime_type=mime_type),  # Đảm bảo sử dụng tên tệp tạm thời
+            client.files.upload(file="temp_audio_file"),  # Không truyền mime_type nữa
         ]
     except Exception as e:
         st.error(f"Error uploading file: {str(e)}")
