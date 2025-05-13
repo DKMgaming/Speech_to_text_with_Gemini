@@ -18,7 +18,7 @@ def generate_transcription(uploaded_file):
     # Khởi tạo client Google GenAI
     client = genai.Client(api_key=API_KEY)
     
-    # Xác định MIME type từ tên tệp (hoặc bạn có thể xác định nó thủ công)
+    # Xác định MIME type từ tên tệp
     mime_type, _ = mimetypes.guess_type(uploaded_file.name)
     
     if not mime_type:
@@ -31,10 +31,10 @@ def generate_transcription(uploaded_file):
     with open("temp_audio_file", "wb") as f:
         f.write(uploaded_file.getvalue())
     
-    # Cố gắng tải tệp lên API GenAI mà không cần truyền MIME type
+    # Tải tệp lên API GenAI với đúng MIME type
     try:
         files = [
-            client.files.upload(file="temp_audio_file"),  # Không truyền mime_type nữa
+            client.files.upload(file="temp_audio_file", mime_type=mime_type),  # Truyền MIME type đúng
         ]
     except Exception as e:
         st.error(f"Error uploading file: {str(e)}")
