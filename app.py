@@ -6,8 +6,9 @@ from io import BytesIO
 # from python_docx import Document
 from docx import Document
 # Tải API Key từ môi trường (cập nhật nếu cần)
-API_KEY = os.getenv("AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ")
 
+# API_KEY = os.getenv("AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ")
+API_KEY = "AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ"
 # Tạo client của Google GenAI
 def generate_transcription(file_path):
     # Khởi tạo client Google GenAI
